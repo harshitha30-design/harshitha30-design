@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeGenie AI</title>
+
+    <style>
+    body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #dbeafe, #f0f9ff);
+}
+
+.container {
+    width: 90%;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+}
+
+h1 {
+    text-align: center;
+    color: #0d6efd;
+    font-size: 42px;
+    margin-bottom: 25px;
+}
+
+h2 {
+    color: #333;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    resize: none;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+button {
+    padding: 12px 20px;
+    margin-top: 15px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #0d6efd;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #084298;
+    transform: scale(1.05);
+}
+.output-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 30px;
+}
+.code-box,
+.preview-box {
+    background: linear-gradient(145deg, #ffffff, #eef4ff);
+    padding: 25px;
+    border-radius: 25px;
+    box-shadow: 0 12px 35px rgba(37, 99, 235, 0.25);
+    border: 2px solid #dbeafe;
+}
+.code-box h2,
+.preview-box h2 {
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    color: white;
+    padding: 12px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+@media(max-width: 768px) {
+    .output-container {
+        flex-direction: column;
+    }
+
+    .code-box,
+    .preview-box {
+        width: 100%;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🤖 CodeGenie AI</h1>
+
+    <h3>Select Template</h3>
+
+    <select id="template" onchange="setTemplate()">
+        <option value="">-- Choose Template --</option>
+        <option value="calculator">Calculator App</option>
+        <option value="todo">To-Do App</option>
+        <option value="login">Login Form</option>
+        <option value="portfolio">Portfolio Website</option>
+        <option value="weather">Weather App</option>
+    </select>
+    </select>
+
+<select id="language">
+  <option value="HTML CSS JavaScript">HTML/CSS/JS</option>
+  <option value="Python">Python</option>
+  <option value="Java">Java</option>
+  <option value="C++">C++</option>
+  <option value="React">React</option>
+  <option value="Node.js">Node.js</option>
+</select>
+
+<br><br>
+
+    <textarea
+        id="prompt"
+        rows="8"
+        placeholder="Enter your coding request..."
+    ></textarea>
+
+    <br>
+<button onclick="generate()">Generate Code</button>
+
+<button onclick="enhancePrompt()">✨ Enhance Prompt</button>
+
+<button onclick="startVoice()">🎤 Voice Prompt</button>
+
+<button onclick="copyCode()">Copy Code</button>
+
+<button onclick="downloadCode()">Download Code</button>
+    <h3>Output:</h3>
+    <div class="output-container">
+  <div class="code-box">
+    <h2>Generated Code</h2>
+    <pre id="output"></pre>
+  </div>
+
+  <div class="preview-box">
+    <h2>Live Preview</h2>
+    <iframe id="preview"></iframe>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+function setTemplate() {
+
+    const template =
+        document.getElementById("template").value;
+
+    const promptBox =
+        document.getElementById("prompt");
+
+    if (template === "calculator") {
+        promptBox.value =
+            "Create a calculator using HTML CSS and JavaScript";
+    }
+
+    else if (template === "todo") {
+        promptBox.value =
+            "Create a To-Do list app using HTML CSS and JavaScript";
+    }
+
+    else if (template === "login") {
+        promptBox.value =
+            "Create a responsive login form using HTML CSS and JavaScript";
+    }
+
+    else if (template === "portfolio") {
+        promptBox.value =
+            "Create a personal portfolio website using HTML CSS and JavaScript";
+    }
+
+    else if (template === "weather") {
+        promptBox.value =
+            "Create a weather app using HTML CSS and JavaScript";
+    }
+}
+function enhancePrompt() {
+
+    let promptBox = document.getElementById("prompt");
+
+    let text = promptBox.value;
+
+    if (text.trim() === "") {
+        alert("Please enter prompt first");
+        return;
+    }
+
+    promptBox.value =
+        "Create a modern, responsive and professional " +
+        text +
+        " with animations, clean UI, comments and advanced styling.";
+}
+
+async function generate() {
+
+    const prompt =
+        document.getElementById("prompt").value;
+
+    const res = await fetch(
+        "http://localhost:5000/generate",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({ prompt })
+        }
+    );
+
+    const data = await res.json();
+        document.getElementById("output").innerText =
+data.result;
+
+document.getElementById("preview").srcdoc =
+data.result;
+}
+
+function copyCode() {
+
+    const output =
+        document.getElementById("output").innerText;
+
+    navigator.clipboard.writeText(output);
+
+    alert("Code copied successfully!");
+}
+
+function startVoice() {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Voice prompt works only in Chrome browser.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = "en-US";
+
+  recognition.start();
+
+  recognition.onresult = function(event) {
+
+    const speechText = event.results[0][0].transcript;
+
+    document.getElementById("prompt").value = speechText;
+  };
+
+  recognition.onerror = function() {
+
+    alert("Voice recognition failed");
+
+  };
+}
+    const output =
+        document.getElementById("output").innerText;
+
+    const blob = new Blob([output], {
+        type: "text/plain"
+    });
+    const link =
+        document.createElement("a");
+
+    link.href =
+        URL.createObjectURL(blob);
+
+    link.download = "generated-code.txt";
+    link.click();
+function startVoice() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Use Google Chrome for voice recognition");
+        return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        const speechText = event.results[0][0].transcript;
+        document.getElementById("prompt").value = speechText;
+    };
+
+    recognition.onerror = function(event) {
+        alert("Voice recognition failed: " + event.error);
+    };
+}s
+recognition.onerror = function(event) {
+    alert("Voice recognition failed: " + event.error);
+};
+function downloadCode() {
+    let code = document.getElementById("output").textContent;
+
+    if (!code) {
+        alert("Generate code first!");
+        return;
+    }
+
+    code = code.replace(/></g, ">\n<");
+
+    const blob = new Blob([code], { type: "text/plain" });
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "generated-code.html";
+    a.click();
+}
+  
+</script>
+</body>
+</html>
